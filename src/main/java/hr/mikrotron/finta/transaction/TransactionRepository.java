@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
-  @Query("select t from Transaction t where t.paired == false")
+  @Query("select t from Transaction t where t.paired = false")
   List<Transaction> findAllUnpaired();
 
-  @Query("select t from Transaction t where t.paired == false and t.credit != null")
+  @Query("select t from Transaction t where t.paired = false and credit != null")
   List<Transaction> findAllUnpairedCredit();
 }
