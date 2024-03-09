@@ -13,6 +13,10 @@ public class TransactionService {
     this.transactionRepository = transactionRepository;
   }
 
+  public Transaction save(Transaction transaction) {
+    return transactionRepository.save(transaction);
+  }
+
   public List<Transaction> findAll() {
     return transactionRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
   }
