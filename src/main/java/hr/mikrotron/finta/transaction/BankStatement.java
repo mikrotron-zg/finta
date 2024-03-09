@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@SuppressWarnings("unused")
 @Entity
 public class BankStatement extends AbstractEntity {
 
