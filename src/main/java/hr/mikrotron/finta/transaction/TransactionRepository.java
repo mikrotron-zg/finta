@@ -9,6 +9,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
   @Query("select t from Transaction t where t.paired = false")
   List<Transaction> findAllUnpaired();
 
-  @Query("select t from Transaction t where t.paired = false and credit != null")
+  @Query("select t from Transaction t where t.paired = false and credit > 0")
   List<Transaction> findAllUnpairedCredit();
 }
