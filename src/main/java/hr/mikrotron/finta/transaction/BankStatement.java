@@ -22,13 +22,13 @@ public class BankStatement extends AbstractEntity {
   @NotNull
   private LocalDate date;
   @NotNull
-  private BigDecimal initialBalance;
+  private BigDecimal initialBalance = new BigDecimal(0);
   @NotNull
-  private BigDecimal finalBalance;
+  private BigDecimal finalBalance = new BigDecimal(0);
   @NotNull
-  private BigDecimal debitTotal;
+  private BigDecimal debitTotal = new BigDecimal(0);
   @NotNull
-  private BigDecimal creditTotal;
+  private BigDecimal creditTotal = new BigDecimal(0);
 
   @OneToMany(fetch = FetchType.EAGER, mappedBy = "bankStatement")
   private Set<Transaction> transactions = new HashSet<>();
@@ -40,6 +40,7 @@ public class BankStatement extends AbstractEntity {
   public void setFileName(String fileName) {
     this.fileName = fileName;
   }
+
   public Integer getSequenceNumber() {
     return sequenceNumber;
   }
