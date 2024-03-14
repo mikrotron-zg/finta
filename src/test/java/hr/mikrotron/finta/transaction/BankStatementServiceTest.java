@@ -53,4 +53,10 @@ class BankStatementServiceTest {
     assertThat(bankStatementService.findAll()).containsExactly(
         bankStatements.get(2), bankStatements.get(1), bankStatements.get(0));
   }
+
+  @Test
+  void findByFileName() {
+    assertThat(bankStatementService.findByFileName("test")).isNull();
+    assertThat(bankStatementService.findByFileName("file")).isNotNull();
+  }
 }

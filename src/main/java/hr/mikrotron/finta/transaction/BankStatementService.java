@@ -25,4 +25,8 @@ public class BankStatementService {
   public List<BankStatement> findAll() {
     return bankStatementRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
   }
+
+  public BankStatement findByFileName(String fileName) {
+    return bankStatementRepository.findFirstByFileName(fileName);
+  }
 }
