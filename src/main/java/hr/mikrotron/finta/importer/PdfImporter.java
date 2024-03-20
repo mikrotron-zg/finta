@@ -2,6 +2,7 @@ package hr.mikrotron.finta.importer;
 
 import hr.mikrotron.finta.transaction.BankStatement;
 import hr.mikrotron.finta.transaction.BankStatementService;
+import hr.mikrotron.finta.util.StringUtil;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
@@ -14,6 +15,7 @@ import java.awt.geom.*;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Optional;
 
 /**
  * Imports PDF bank statement.
@@ -26,28 +28,30 @@ public class PdfImporter {
   @Value("${pdf.import-directory}")
   private String importDirectory;
   private PDDocument document;
+  private PdfDocumentRegionConfiguration regionConfiguration;
 
   public PdfImporter(BankStatementService bankStatementService) {
     this.bankStatementService = bankStatementService;
   }
 
-  public boolean importFile(String fileName) {
+  public Optional<BankStatement> importFile(String fileName) {
     if (bankStatementService.findByFileName(fileName) != null) { // we already have this one
       LOGGER.debug("File {} already imported", fileName);
-      return false;
+      return Optional.empty();
     }
 
     try {
       loadPdfDocument(importDirectory + fileName);
     } catch (IOException exception) {
       LOGGER.debug("File {}{} does not exist", importDirectory, fileName);
-      return false;
+      return Optional.empty();
     }
 
     bankStatement.setFileName(fileName);
+    regionConfiguration = new PdfDocumentRegionConfiguration();
     extractHeader();
     extractTransactions();
-    return bankStatementService.save(bankStatement).equals(bankStatement);
+    return Optional.of(bankStatementService.save(bankStatement));
   }
 
   private void loadPdfDocument(String filePath) throws IOException {
@@ -55,8 +59,22 @@ public class PdfImporter {
   }
 
   private void extractHeader() {
-    bankStatement.setDate(LocalDate.now());
-    bankStatement.setSequenceNumber(1);
+    bankStatement.setDate(extractStatementDate());
+    bankStatement.setSequenceNumber(extractStatementSequenceNumber());
+  }
+
+  private Integer extractStatementSequenceNumber() {
+    try {
+      return StringUtil.extractLastInteger(
+          getTextFromRegion(regionConfiguration.getRegionByName("sequence_number").getRectangle()));
+    } catch (IOException exception) {
+      LOGGER.debug("Got IO exception while trying to parse sequence number");
+      return 0;
+    }
+  }
+
+  private LocalDate extractStatementDate() {
+    return LocalDate.now();
   }
 
   private void extractTransactions() {

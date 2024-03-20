@@ -1,6 +1,7 @@
 package hr.mikrotron.finta.importer;
 
 import hr.mikrotron.finta.transaction.BankStatement;
+import hr.mikrotron.finta.transaction.BankStatementRepository;
 import hr.mikrotron.finta.transaction.BankStatementService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -24,10 +24,14 @@ class PdfImporterTest {
   private BankStatementService bankStatementService;
   @Value("${pdf.import.test.filename}") // see readme for instructions!
   private String fileName;
+  @Value("${pdf.import.test.sequence-number}")
+  private Integer sequenceNumber;
+  @Autowired
+  private BankStatementRepository bankStatementRepository;
 
   @Test
   void fileNotFoundTest() {
-    assertFalse(pdfImporter.importFile("this_file_should_not_exist"));
+    assertThat(pdfImporter.importFile("this_file_should_not_exist")).isEmpty();
   }
 
   @Test
@@ -38,11 +42,18 @@ class PdfImporterTest {
     bankStatement.setDate(LocalDate.now());
 
     assertThat(bankStatementService.save(bankStatement)).isEqualTo(bankStatement);
-    assertFalse(pdfImporter.importFile(fileName));
+    assertThat(pdfImporter.importFile(fileName)).isEmpty();
   }
 
   @Test
   void importFile() {
-    assertTrue(pdfImporter.importFile(fileName));
+    assertThat(pdfImporter.importFile(fileName)).isNotEmpty();
+  }
+
+  @Test
+  void sequenceNumber() {
+    assertThat(pdfImporter.importFile(fileName)
+        .orElse(new BankStatement())
+        .getSequenceNumber()).isEqualTo(sequenceNumber);
   }
 }
