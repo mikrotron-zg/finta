@@ -14,7 +14,7 @@ class PdfDocumentRegionConfiguration {
 
   private void generateDefaultConfiguration() {
     regions.add(new PdfDocumentRegion(0, 40, 200, 20, "sequence_number"));
-    regions.add(new PdfDocumentRegion(355, 40, 100, 20, "date"));
+    regions.add(new PdfDocumentRegion(355, 40, 50, 16, "date"));
     regions.add(new PdfDocumentRegion(740, 40, 70, 70, "balance"));
     regions.add(new PdfDocumentRegion(0, 170, 50, 500, "column1"));
     regions.add(new PdfDocumentRegion(50, 170, 180, 500, "column2"));

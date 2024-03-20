@@ -22,12 +22,14 @@ class PdfImporterTest {
   private PdfImporter pdfImporter;
   @Autowired
   private BankStatementService bankStatementService;
+  @Autowired
+  private BankStatementRepository bankStatementRepository;
   @Value("${pdf.import.test.filename}") // see readme for instructions!
   private String fileName;
   @Value("${pdf.import.test.sequence-number}")
   private Integer sequenceNumber;
-  @Autowired
-  private BankStatementRepository bankStatementRepository;
+  @Value("${pdf.import.test.date}")
+  private String date;
 
   @Test
   void fileNotFoundTest() {
@@ -55,5 +57,11 @@ class PdfImporterTest {
     assertThat(pdfImporter.importFile(fileName)
         .orElse(new BankStatement())
         .getSequenceNumber()).isEqualTo(sequenceNumber);
+  }
+
+  @Test
+  void bankStatementDate() {
+    assertThat(pdfImporter.importFile(fileName).orElse(new BankStatement()).getDate()
+        .isEqual(LocalDate.parse(date)));
   }
 }

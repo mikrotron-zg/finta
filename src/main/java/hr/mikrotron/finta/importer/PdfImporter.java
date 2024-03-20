@@ -9,12 +9,15 @@ import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Component;
 
 import java.awt.geom.*;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -74,7 +77,14 @@ public class PdfImporter {
   }
 
   private LocalDate extractStatementDate() {
-    return LocalDate.now();
+    try {
+      return LocalDate.parse(getTextFromRegion(regionConfiguration.getRegionByName("date")
+          .getRectangle()).trim(),
+          DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+    } catch (IOException exception) {
+      LOGGER.debug("Got IO exception while trying to parse bank statement date");
+      return LocalDate.of(1900,1,1);
+    }
   }
 
   private void extractTransactions() {
