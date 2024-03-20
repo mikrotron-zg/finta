@@ -22,3 +22,4 @@ webpack.generated.js
 
 # Test properties
 importer-test.properties
+/import/test/
