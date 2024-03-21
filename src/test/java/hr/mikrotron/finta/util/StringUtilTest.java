@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Locale;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StringUtilTest {
@@ -23,5 +24,11 @@ class StringUtilTest {
     assertEquals(1001.23, StringUtil.extractLastNumber("abc1.001,23"));
     assertEquals(1001.23, StringUtil.extractLastNumber("126,32 1.001,23"));
     assertEquals(0.0, StringUtil.extractLastNumber("abc"));
+  }
+
+  @Test
+  void extractAllNumbers() {
+    assertThat(StringUtil.extractAllNumbers("abc")).isEmpty();
+    assertThat(StringUtil.extractAllNumbers("abc126,32 0,00\n 1.001,23 ")).contains(126.32, 0.0, 1001.23);
   }
 }
