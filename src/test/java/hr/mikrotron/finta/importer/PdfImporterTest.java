@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +31,15 @@ class PdfImporterTest {
   private Integer sequenceNumber;
   @Value("${pdf.import.test.date}")
   private String date;
+  @Value("${pdf.import.test.initial-balance}")
+  private Double initialBalance;
+  @Value("${pdf.import.test.final-balance}")
+  private Double finalBalance;
+  @Value("${pdf.import.test.debit-total}")
+  private Double debitTotal;
+  @Value("${pdf.import.test.credit-total}")
+  private Double creditTotal;
+
 
   @Test
   void fileNotFoundTest() {
@@ -61,7 +71,31 @@ class PdfImporterTest {
 
   @Test
   void bankStatementDate() {
-    assertThat(pdfImporter.importFile(fileName).orElse(new BankStatement()).getDate()
-        .isEqual(LocalDate.parse(date)));
+    assertThat(pdfImporter.importFile(fileName).orElse(new BankStatement()).getDate())
+        .isEqualTo(LocalDate.parse(date));
+  }
+
+  @Test
+  void bankStatementInitialBalance() {
+    assertThat(pdfImporter.importFile(fileName).orElse(new BankStatement()).getInitialBalance())
+        .isEqualTo(BigDecimal.valueOf(initialBalance));
+  }
+
+  @Test
+  void bankStatementCreditTotal() {
+    assertThat(pdfImporter.importFile(fileName).orElse(new BankStatement()).getCreditTotal())
+        .isEqualTo(BigDecimal.valueOf(creditTotal));
+  }
+
+  @Test
+  void bankStatementDebitTotal() {
+    assertThat(pdfImporter.importFile(fileName).orElse(new BankStatement()).getDebitTotal())
+        .isEqualTo(BigDecimal.valueOf(debitTotal));
+  }
+
+  @Test
+  void bankStatementFinalBalance() {
+    assertThat(pdfImporter.importFile(fileName).orElse(new BankStatement()).getFinalBalance())
+        .isEqualTo(BigDecimal.valueOf(finalBalance));
   }
 }

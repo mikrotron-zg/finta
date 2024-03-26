@@ -9,15 +9,14 @@ import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Component;
 
 import java.awt.geom.*;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -64,6 +63,7 @@ public class PdfImporter {
   private void extractHeader() {
     bankStatement.setDate(extractStatementDate());
     bankStatement.setSequenceNumber(extractStatementSequenceNumber());
+    extractBalance();
   }
 
   private Integer extractStatementSequenceNumber() {
@@ -83,6 +83,21 @@ public class PdfImporter {
     } catch (IOException exception) {
       LOGGER.debug("Got IO exception while trying to parse bank statement date");
       return LocalDate.of(1900,1,1);
+    }
+  }
+
+  private void extractBalance() {
+    try {
+      List<Double> balance = StringUtil.extractAllNumbers(
+          getTextFromRegion(regionConfiguration.getRegionByName("balance").getRectangle()));
+      if (balance.size() == 4) {
+        bankStatement.setInitialBalance(BigDecimal.valueOf(balance.get(0)));
+        bankStatement.setCreditTotal(BigDecimal.valueOf(balance.get(1)));
+        bankStatement.setDebitTotal(BigDecimal.valueOf(balance.get(2)));
+        bankStatement.setFinalBalance(BigDecimal.valueOf(balance.get(3)));
+        }
+    } catch (IOException exception) {
+      LOGGER.debug("Got IO exception while trying to parse balance");
     }
   }
 
