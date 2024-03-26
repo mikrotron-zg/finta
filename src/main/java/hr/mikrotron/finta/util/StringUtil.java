@@ -2,9 +2,12 @@ package hr.mikrotron.finta.util;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +17,8 @@ import java.util.regex.Pattern;
 public abstract class StringUtil {
 
   private static final Locale defaultLocale = Locale.GERMANY;
+
+  private StringUtil() {}
 
   /**
    * Extract last integer value in a string
@@ -84,4 +89,18 @@ public abstract class StringUtil {
     }
     return results;
   }
+
+  /**
+   * Extract date from a string
+   * @param text string to search
+   * @return date
+   */
+  public static Optional<LocalDate> extractFirstDate(String text) {
+    Matcher matcher = Pattern.compile("\\d{2}.\\d{2}.\\d{4}").matcher(text);
+    if (matcher.find()) {
+      return Optional.of(LocalDate.parse(matcher.group(), DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+    }
+    return Optional.empty();
+  }
 }
+

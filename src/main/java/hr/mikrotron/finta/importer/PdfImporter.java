@@ -78,9 +78,8 @@ public class PdfImporter {
 
   private LocalDate extractStatementDate() {
     try {
-      return LocalDate.parse(getTextFromRegion(regionConfiguration.getRegionByName("date")
-          .getRectangle()).trim(),
-          DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+      return StringUtil.extractFirstDate(getTextFromRegion(regionConfiguration.getRegionByName("date")
+          .getRectangle())).orElse(LocalDate.of(1900,1,1));
     } catch (IOException exception) {
       LOGGER.debug("Got IO exception while trying to parse bank statement date");
       return LocalDate.of(1900,1,1);
